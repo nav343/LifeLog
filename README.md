@@ -132,15 +132,17 @@ LifeLog/
 ---
 
 ## 🚀 How to Run
-1. Clone the repository
-```bash
-git clone https://github.com/nav343/LifeLog
-```
+1. Clone the repository:
 
+   ```
+   git clone https://github.com/nav343/LifeLog
+   
+   ```
 2. Install dependencies:
 
    ```
    pip install matplotlib
+   
    ```
 * (Using a virtual environment is recommended)
 
