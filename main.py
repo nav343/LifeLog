@@ -327,6 +327,8 @@ def EditDelete(username: str):
                 confirm = screen.input("Are you sure you want to delete this entry? (Y/N)")
                 if confirm.upper() == 'Y':
                     os.remove(f'.lifelog/{username}/{titles[choice].replace(" ", "_").lower()}.dat')
+                screen.clear()
+                screen.render()
             else:
                 screen.clear()
                 screen.render()
