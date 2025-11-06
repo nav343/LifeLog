@@ -50,7 +50,7 @@ LifeLog is a console-based digital diary that allows users to write daily journa
   * Typically stored in:
 
     * User Data and Stats in `.lifelog/user.dat` & `.lifelog/stats.dat`
-    * Diary entries in `.lifelog/<username>`
+    * Diary entries in `.lifelog/<username>/`
 
 ### **Python Libraries Used**
 
@@ -126,6 +126,7 @@ LifeLog/
 |   └── window.py
 |
 |── main.py
+|── plot.py
 └── README.md
 ```
 
@@ -136,18 +137,18 @@ LifeLog/
 
    ```
    git clone https://github.com/nav343/LifeLog
-   
    ```
+2. Change Directory
+    ```
+    cd LifeLog
+    ```
 2. Install dependencies:
 
    ```
    pip install matplotlib
-   
    ```
 * (Using a virtual environment is recommended)
-
-
-3. Run the app:
+4. Run the app:
 
    ```
    python main.py
