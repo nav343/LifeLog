@@ -14,8 +14,10 @@ class Window():
         self.__set_buffer()
 
     def __remove_emoji(self, txt:str) -> int:
-        if any(element in txt for element in ['✍️', '📖', '🧹', '📊', '🔒', '🌿', '😊', '😌', '😔', '😤', '😎', '💭' ]):
+        if any(element in txt for element in ['📖', '🧹', '📊', '🔒', '🌿', '😊', '😌', '😔', '😤', '😎', '💭', "👋" ]):
             return txt.count(txt[0]) + 1
+        elif any(element in txt for element in ['✍️','😊', '😌', '😔', '😤', '😎' ]):
+            return 0 if txt.count(txt[0]) == 1 else -1
         else:
             return 1
 

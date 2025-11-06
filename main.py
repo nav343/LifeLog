@@ -1,3 +1,4 @@
+from plot import Plot
 from utils.window import Window
 import pickle
 import time
@@ -106,29 +107,35 @@ def ViewAll(username: str):
         screen.print()
         screen.print()
 
-    choice = int(screen.input("Which entry do you want to see? (-1 to quit): "))
-    if choice > len(os.listdir(f".lifelog/{username}")):
-        screen.print("Invalid. Try again")
-        screen.render()
-    else:
-        if choice == -1:
-            screen.clear()
+    try:
+        choice = int(screen.input("Which entry do you want to see? (-1 to quit): "))
+        if choice > len(os.listdir(f".lifelog/{username}")):
+            screen.print("Invalid. Try again")
             screen.render()
         else:
-            screen.clear()
-            screen.render()
-            with open(f".lifelog/{username}/{os.listdir(f".lifelog/{username}")[choice-1]}", 'rb') as file:
-                data = pickle.load(file)
-                mood = moods[int(data['mood'])]
-                date = data['date']
-                content = data['content']
-                screen.print(f"[{date}] - [{mood} ]")
-                screen.print(f"Title: {os.listdir(f".lifelog/{username}")[choice-1].replace("_", " ").title()[:-4]}")
-                screen.print("-"*(os.get_terminal_size().columns - 4))
-                screen.print(content)
-                screen.print("-"*(os.get_terminal_size().columns - 4))
-            screen.print()
-            screen.input("Press ENTER to go back!")
+            if choice == -1:
+                screen.clear()
+                screen.render()
+            else:
+                screen.clear()
+                screen.render()
+                with open(f".lifelog/{username}/{os.listdir(f".lifelog/{username}")[choice-1]}", 'rb') as file:
+                    data = pickle.load(file)
+                    mood = moods[int(data['mood'])]
+                    date = data['date']
+                    content = data['content']
+                    screen.print(f"[{date}] - [{mood} ]")
+                    screen.print(f"Title: {os.listdir(f".lifelog/{username}")[choice-1].replace("_", " ").title()[:-4]}")
+                    screen.print("-"*(os.get_terminal_size().columns - 4))
+                    screen.print(content)
+                    screen.print("-"*(os.get_terminal_size().columns - 4))
+                screen.print()
+                screen.input("Press ENTER to go back!")
+                screen.clear()
+                screen.render()
+    except Exception:
+        screen.clear()
+        screen.render()
 
 def ViewDateRange(username: str):
     Header("📖  VIEW ENTRIES BY DATE 📖")
@@ -155,6 +162,8 @@ def ViewDateRange(username: str):
         screen.print()
         screen.render()
     screen.input("Press ENTER to go back!!")
+    screen.clear()
+    screen.render()
 
 def ViewByMood(username: str):
     Header("💭 VIEW ENTRIES BY MOOD 💭")
@@ -193,6 +202,8 @@ def ViewByMood(username: str):
             screen.print()
             screen.render()
         screen.input("Press ENTER to go back!!")
+        screen.clear()
+        screen.render()
 
 def ViewEntries(username: str):
     Header("📖  VIEW PAST ENTRIES  📖")
@@ -248,6 +259,16 @@ def MoodAnalytics(username: str):
         screen.print()
         screen.print('-'*(os.get_terminal_size().columns-4))
         screen.print(f"Most common mood: {moods[mostCommon]}")
+        screen.print('-'*(os.get_terminal_size().columns-4))
+        screen.print("Plotting chart....")
+        screen.render()
+        try:
+            Plot(stats)
+        except Exception as E:
+            screen.print("[x] Could not plot chart due to some unforseen reasons. Sorry")
+            screen.print(str(E))
+            screen.render()
+            time.sleep(1)
         screen.render()
     screen.input("Press ENTER to go back!!")
     screen.clear()
@@ -268,44 +289,50 @@ def EditDelete(username: str):
         idx += 1
     screen.print('-'*(os.get_terminal_size().columns-4))
 
-    choice = int(screen.input("Index of the entry to edit/delete:"))-1
-    if choice < 0 or choice > idx:
-        screen.clear()
-        screen.render()
-    else:
-        screen.clear()
-        screen.render()
-        screen.print(f"You selected: {titles[choice]}")
-        screen.print()
-        screen.print("What would you like to do?")
-        screen.print("[1] Edit this entry")
-        screen.print("[2] Delete this entry")
-        screen.print("[3] Cancel")
-        screen.print('-'*(os.get_terminal_size().columns-4))
-        action = int(screen.input("Enter your choice: "))
-        if action == 1:
+    try:
+        choice = int(screen.input("Index of the entry to edit/delete (or ENTER to go back):"))-1
+        if choice < 0 or choice > idx:
             screen.clear()
             screen.render()
-            screen.print("Editing Entry...")
-            newMood = screen.input("New Mood: ")
-            screen.print("Modify text below (type END when done):")
-            diary = screen.editor("> ") 
-            screen.print()
-            screen.print("-"*(os.get_terminal_size().columns - 4))
-            screen.print()
-            with open(f".lifelog/{username}/{titles[choice].replace(" ","_").lower()}.dat", 'wb') as file:
-                data = { "content": diary, "mood": newMood, "date": datetime.now().strftime("%d %B %Y") }
-                pickle.dump(data, file)
-            screen.print("[✔] Entry updated successfully!")
-            screen.render()
-
-        elif action == 2:
-            confirm = screen.input("Are you sure you want to delete this entry? (Y/N)")
-            if confirm.upper() == 'Y':
-                os.remove(f'.lifelog/{username}/{titles[choice].replace(" ", "_").lower()}.dat')
         else:
             screen.clear()
             screen.render()
+            screen.print(f"You selected: {titles[choice]}")
+            screen.print()
+            screen.print("What would you like to do?")
+            screen.print("[1] Edit this entry")
+            screen.print("[2] Delete this entry")
+            screen.print("[3] Cancel")
+            screen.print('-'*(os.get_terminal_size().columns-4))
+            action = int(screen.input("Enter your choice: "))
+            if action == 1:
+                screen.clear()
+                screen.render()
+                screen.print("Editing Entry...")
+                newMood = screen.input("New Mood: ")
+                screen.print("Modify text below (type END when done):")
+                diary = screen.editor("> ") 
+                screen.print()
+                screen.print("-"*(os.get_terminal_size().columns - 4))
+                screen.print()
+                with open(f".lifelog/{username}/{titles[choice].replace(" ","_").lower()}.dat", 'wb') as file:
+                    data = { "content": diary, "mood": newMood, "date": datetime.now().strftime("%d %B %Y") }
+                    pickle.dump(data, file)
+                screen.print("[✔] Entry updated successfully!")
+                screen.input("Press ENTER to go back")
+                screen.clear()
+                screen.render()
+
+            elif action == 2:
+                confirm = screen.input("Are you sure you want to delete this entry? (Y/N)")
+                if confirm.upper() == 'Y':
+                    os.remove(f'.lifelog/{username}/{titles[choice].replace(" ", "_").lower()}.dat')
+            else:
+                screen.clear()
+                screen.render()
+    except Exception:
+        screen.clear()
+        screen.render()
     
 
 def Dashboard(username: str):
@@ -323,6 +350,7 @@ def Dashboard(username: str):
     screen.print("[3] 🧹  Edit or delete an entry")  
     screen.print("[4] 📊  View mood analytics")  
     screen.print("[5] 🔒  Log out")  
+    screen.print("[6] 👋  Quit")  
     screen.print()
     screen.print('-'*(os.get_terminal_size().columns-4))
     screen.print()
@@ -340,6 +368,9 @@ def Dashboard(username: str):
     elif choice == 5:
         Logout()
         Quit(username, logged=True)
+    elif choice == 6:
+        Quit(username, logged=False)
+        screen.quit()
     else:
         screen.print("Invalid")
         screen.render()
@@ -477,48 +508,63 @@ try:
         screen.print("You seem new here!!!\nCreate an account to start your diary journey right now!!", True)
 
     while True:
-        # DASHBOARD SCREEN
-        Header("🌿  WELCOME TO LIFELOG 🌿")
-        screen.print("""• [1] Login to your account  
+        logged = False
+        if os.path.isdir('.lifelog'):
+            stats = loadStats()
+            try:
+                if stats['logged']:
+                    logged = True
+            except KeyError:
+                    logged = False
+
+
+        if not logged:
+            # DASHBOARD SCREEN
+            Header("🌿  WELCOME TO LIFELOG 🌿")
+            screen.print("""• [1] Login to your account  
 ○ [2] Create a new account  
 ○ [3] Exit""")
-        screen.render()
-        opt = ''
-        try:
-            opt = int(input(">>> "))
-        except Exception:
-            if opt == '':
-                opt = 1
-        screen.clear()
-        Header("🌿  WELCOME TO LIFELOG 🌿")
-        screen.print(f"""{'•' if opt == 1 else '○'} [1] Login to your account  
+            screen.render()
+            opt = ''
+            try:
+                opt = int(input(">>> "))
+            except Exception:
+                if opt == '':
+                    opt = 1
+            screen.clear()
+            Header("🌿  WELCOME TO LIFELOG 🌿")
+            screen.print(f"""{'•' if opt == 1 else '○'} [1] Login to your account  
 {'•' if opt == 2 else '○'} [2] Create a new account  
 {'•' if opt == 3 else '○'} [3] Exit""")
-        screen.render()
-        time.sleep(0.5)
-        screen.clear()
-
-        if opt == 1:
-            if os.path.isdir('.lifelog'):
-                stats = loadStats()
-                try:
-                    if stats['logged']:
-                        Dashboard(stats['username'])
-                except KeyError:
-                    Login()
-            else:
-                Login() 
-
-        elif opt == 2:
-            CreateUser()
-
-        elif opt == 3:
-            Quit("", logged=False)
-            break
-
-        else:
-            screen.clear()
             screen.render()
-        screen.clear()
+            time.sleep(0.5)
+            screen.clear()
+
+            if opt == 1:
+                if logged:
+                    stats = loadStats()
+                    try:
+                        if stats['logged']:
+                            Dashboard(stats['username'])
+                    except KeyError:
+                        Login()
+                else:
+                    Login() 
+
+            elif opt == 2:
+                CreateUser()
+
+            elif opt == 3:
+                Quit("", logged=False)
+                break
+
+            else:
+                screen.clear()
+                screen.render()
+            screen.clear()
+        else:
+            stats = loadStats()
+            Dashboard(stats['username'])
+
 except KeyboardInterrupt:
     exit()
