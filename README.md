@@ -93,7 +93,7 @@ Example (data before serialization):
 ```
 
 
-### **.lifelog/<Username>/<Diary Title>.dat**
+### **.lifelog/(Username)/(Diary Title).dat**
 
 Stores journal entries
 
