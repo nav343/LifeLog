@@ -1,4 +1,5 @@
 from plot import Plot
+from utils.colors import COLORS
 from utils.window import Window
 import pickle
 import time
@@ -12,7 +13,7 @@ moods = {
     4: "😤 Stressed",
     5: "😎 Confident",
 }
-logo = """
+logo = f"""
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣧⠀⠀⣴⠄⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⡀⣰⣏⡤⠀⢀⡀⠀⠀⠀⠀
@@ -28,15 +29,15 @@ logo = """
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠖⠁⢠⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡈⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠇⠀⠀⢸⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⠃⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀ ⠀⠙⣿⠃⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 LifeLog
 """
 
-def Header(msg: str):
-    screen.print("═"*(os.get_terminal_size().columns - 6))
-    screen.print(msg, True)
-    screen.print("═"*(os.get_terminal_size().columns - 10), True)
+def Header(msg: str, color: str = COLORS.LIGHT_WHITE):
+    screen.line("═", COLORS.PURPLE)
+    screen.print(msg, True, COLORS.CYAN)
+    screen.line("═", COLORS.PURPLE)
     screen.print()
 
 def Login():
@@ -99,7 +100,7 @@ def ViewAll(username: str):
             date = data['date']
             content = data['content'][:30] + "..."
             screen.print(f"[{idx}] [{date}] - [{mood} ]")
-            screen.print(f"Title: {i.replace("_", " ").title()[:-4]}")
+            screen.print(f"Title: {i.replace('_', ' ').title()[:-4]}")
             screen.print("-"*(os.get_terminal_size().columns - 4))
             screen.print(content)
             screen.print("-"*(os.get_terminal_size().columns - 4))
@@ -119,13 +120,13 @@ def ViewAll(username: str):
             else:
                 screen.clear()
                 screen.render()
-                with open(f".lifelog/{username}/{os.listdir(f".lifelog/{username}")[choice-1]}", 'rb') as file:
+                with open(f".lifelog/{username}/{os.listdir(f'.lifelog/{username}')[choice-1]}", 'rb') as file:
                     data = pickle.load(file)
                     mood = moods[int(data['mood'])]
                     date = data['date']
                     content = data['content']
                     screen.print(f"[{date}] - [{mood} ]")
-                    screen.print(f"Title: {os.listdir(f".lifelog/{username}")[choice-1].replace("_", " ").title()[:-4]}")
+                    screen.print(f"Title: {os.listdir(f'.lifelog/{username}')[choice-1].replace('_', ' ').title()[:-4]}")
                     screen.print("-"*(os.get_terminal_size().columns - 4))
                     screen.print(content)
                     screen.print("-"*(os.get_terminal_size().columns - 4))
@@ -152,8 +153,8 @@ def ViewDateRange(username: str):
             date = datetime.strptime(datetime.strptime(data['date'], "%d %B %Y").strftime("%d-%m-%Y"), "%d-%m-%Y")
             content = data['content'][:30] + "..."
             if date > start and date < end:
-                screen.print(f"[{idx}] [{date.strftime("%d %b %Y")}] - [{mood} ]")
-                screen.print(f"Title: {i.replace("_", " ").title()[:-4]}")
+                screen.print(f"[{idx}] [{date.strftime('%d %b %Y')}] - [{mood} ]")
+                screen.print(f"Title: {i.replace('_', ' ').title()[:-4]}")
                 screen.print("-"*(os.get_terminal_size().columns - 4))
                 screen.print(content)
                 screen.print("-"*(os.get_terminal_size().columns - 4))
@@ -193,7 +194,7 @@ def ViewByMood(username: str):
                 date = data['date']
                 content = data['content'][:30] + "..."
                 if mood == dMood:
-                    screen.print(f"[{idx}] [{date}] - Title: {i.replace("_", " ").title()[:-4]}")
+                    screen.print(f"[{idx}] [{date}] - Title: {i.replace('_', ' ').title()[:-4]}")
                     screen.print("-"*(os.get_terminal_size().columns - 4))
                     screen.print(content)
                     screen.print("-"*(os.get_terminal_size().columns - 4))
@@ -264,6 +265,7 @@ def MoodAnalytics(username: str):
         screen.render()
         try:
             Plot(stats)
+            pass
         except Exception as E:
             screen.print("[x] Could not plot chart due to some unforseen reasons. Sorry")
             screen.print(str(E))
@@ -285,7 +287,7 @@ def EditDelete(username: str):
             mood = moods[int(data['mood'])][2:]
             titles.append(i.replace("_", " ").title()[:-4])
             date = datetime.strptime(data['date'], "%d %B %Y").strftime("%d %b %Y")
-            screen.print(f"[{idx}] [{date}] - {i.replace("_", " ").title()[:-4]} ({mood})")
+            screen.print(f"[{idx}] [{date}] - {i.replace('_', ' ').title()[:-4]} ({mood})")
         idx += 1
     screen.print('-'*(os.get_terminal_size().columns-4))
 
@@ -315,7 +317,7 @@ def EditDelete(username: str):
                 screen.print()
                 screen.print("-"*(os.get_terminal_size().columns - 4))
                 screen.print()
-                with open(f".lifelog/{username}/{titles[choice].replace(" ","_").lower()}.dat", 'wb') as file:
+                with open(f".lifelog/{username}/{titles[choice].replace(' ','_').lower()}.dat", 'wb') as file:
                     data = { "content": diary, "mood": newMood, "date": datetime.now().strftime("%d %B %Y") }
                     pickle.dump(data, file)
                 screen.print("[✔] Entry updated successfully!")
@@ -340,43 +342,47 @@ def EditDelete(username: str):
 def Dashboard(username: str):
     lastLogged = loadStats()['lastLogged']
 
-    Header("🌿 LifeLog Dashboard 🌿")
-    screen.print(f"Welcome back {username}!!")
-    screen.print(f"Last Login: {lastLogged} | Total Entires: {len(os.listdir(f".lifelog/{username}/"))}")
+    Header("🌿 LifeLog Dashboard 🌿", COLORS.LIGHT_BLUE)
+    screen.print(f"Welcome back {username}!!", color=COLORS.LIGHT_GREEN)
+    screen.print(f"Last Login: {lastLogged} | Total Entires: {len(os.listdir(f'.lifelog/{username}/'))}", color=COLORS.LIGHT_GREEN)
     screen.print()
-    screen.print('-'*(os.get_terminal_size().columns-4))
-    screen.print("What would you like to do today?")
+    screen.line()
+    screen.print("What would you like to do today?", color=COLORS.YELLOW)
     screen.print()
     screen.print("[1] ✍️   Add a new entry")
     screen.print("[2] 📖  View past entries")  
     screen.print("[3] 🧹  Edit or delete an entry")  
     screen.print("[4] 📊  View mood analytics")  
-    screen.print("[5] 🔒  Log out")  
-    screen.print("[6] 👋  Quit")  
+    screen.print("[5] 🔒  Log out", color=COLORS.LIGHT_RED)  
+    screen.print("[6] 👋  Quit", color=COLORS.LIGHT_RED)  
     screen.print()
-    screen.print('-'*(os.get_terminal_size().columns-4))
+    screen.line()
     screen.print()
-    choice = int(screen.input("Enter your choice: "))
-    screen.render()
-    screen.clear()
-    if choice == 1:
-        AddEntry(username)
-    elif choice == 2:
-        ViewEntries(username)
-    elif choice == 3:
-        EditDelete(username)
-    elif choice == 4:
-        MoodAnalytics(username)
-    elif choice == 5:
-        Logout()
-        Quit(username, logged=True)
-    elif choice == 6:
-        Quit(username, logged=False)
-        screen.quit()
-    else:
-        screen.print("Invalid")
+    try:
+        choice = int(screen.input("Enter your choice: ", color=COLORS.LIGHT_GREEN))
         screen.render()
         screen.clear()
+        if choice == 1:
+            AddEntry(username)
+        elif choice == 2:
+            ViewEntries(username)
+        elif choice == 3:
+            EditDelete(username)
+        elif choice == 4:
+            MoodAnalytics(username)
+        elif choice == 5:
+            Logout()
+            Quit(username, logged=True)
+        elif choice == 6:
+            Quit(username, logged=False)
+            screen.quit()
+        else:
+            screen.print("Invalid")
+            screen.render()
+            screen.clear()
+    except Exception:
+        screen.clear()
+        screen.render()
 
 def Logout():
     stats = loadStats()
@@ -386,7 +392,7 @@ def Logout():
 
 def AddEntry(username: str):
     Header("✍️  ADD A NEW ENTRY  ✍️")
-    screen.print(f"Date: {datetime.now().strftime("%d %B %Y")} | User: {username}")
+    screen.print(f"Date: {datetime.now().strftime('%d %B %Y')} | User: {username}")
     title = screen.input("Title: ")
     screen.print("-"*(os.get_terminal_size().columns - 4))
     screen.print("Write your diary below (Type END on a new line to finish)")
@@ -402,7 +408,7 @@ def AddEntry(username: str):
     mood = screen.input("Enter your mood (1-5):")
     screen.print()
 
-    with open(f".lifelog/{username}/{title.replace(" ","_").lower()}.dat", 'wb') as file:
+    with open(f".lifelog/{username}/{title.replace(' ','_').lower()}.dat", 'wb') as file:
         data = { "content": diary, "mood": mood, "date": datetime.now().strftime("%d %B %Y") }
         pickle.dump(data, file)
 
@@ -487,6 +493,12 @@ def Quit(username: str,logged: bool):
     time.sleep(1)
     screen.clear()
 
+def genLogo():
+    for line in logo.split('\n'):
+        if line.strip() == 'LifeLog':
+            screen.print(line, True, COLORS.YELLOW)
+        else:
+            screen.print(line, True, COLORS.LIGHT_GREEN)
 
 def loadStats():
     with open(".lifelog/stats.dat", 'rb') as stats:
@@ -494,14 +506,14 @@ def loadStats():
 try:
 # WELCOME SCREEN
     screen = Window('LifeLog')
-    screen.print(logo,True)
+    genLogo()
     screen.render()
     time.sleep(2)
     screen.clear()
     screen.CenterText("═"*(os.get_terminal_size().columns - 6))
     screen.print("🌿  WELCOME TO LIFELOG 🌿", True)
     screen.print("═"*(os.get_terminal_size().columns - 10), True)
-    screen.print("Your personal digital diary & mood companion.", True)
+    screen.print("Your personal digital diary & mood companion.", True, COLORS.LIGHT_GREEN)
     screen.render()
     time.sleep(2)
     screen.clear()
