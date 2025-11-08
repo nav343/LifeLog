@@ -1,5 +1,10 @@
 import os
 
+if os.name == 'posix':
+    import readline
+
+from utils.colors import COLORS, TextColor
+
 class Window():
     def __init__(self, title: str="Window") -> None:
         self.__clear = 'cls' if os.name == 'nt' else 'clear'
@@ -22,21 +27,12 @@ class Window():
             return 1
 
     def __format(self, txt: str, centered: bool=False):
-        """
-        struc = list(" "*(self.window_size[1]))
-        txt = txt.strip()
-        struc[0] = struc[-1] = "|"
-        if centered:
-            for i in range(0, len(txt)):
-                struc[len(struc)//2 - len(txt)//2 + i] = txt[i]
+        if txt[:2] == "\x1b[":
+            main = txt[7:-4]
         else:
-            for i in range(0, len(txt)):
-                struc[2 + i] = txt[i]
-        struc = ''.join(struc)
-        return struc
-        """
-        partial = f"|{' '*((self.window_size[1] - len(txt))//2 - (self.__remove_emoji(txt)))}{txt}" if centered else f"| {txt}"
-        return f"{partial}{' '*(self.window_size[1] - len(partial)- (self.__remove_emoji(txt)))}|"
+            main = txt
+        partial = f"|{' '*((self.window_size[1] - len(main))//2 - (self.__remove_emoji(main)))}{txt}" if centered else f"| {txt}"
+        return f"{partial}{' '*(self.window_size[1] - len(partial) + (0 if main == txt else 11) - (self.__remove_emoji(main)))}|"
 
     def __set_buffer(self):
         self.__buffer.append(f"+{'-' * (self.window_size[1] - 2)}+")
@@ -67,8 +63,8 @@ class Window():
         for buf in self.__buffer:
             print(buf)
 
-    def CenterText(self, msg: str):
-        self.__buffer[self.window_size[0]//2] = self.__format(msg, True)
+    def CenterText(self, msg: str, color: str=COLORS.LIGHT_WHITE):
+        self.__buffer[self.window_size[0]//2] = self.__format(TextColor(msg, color), True)
         self.__pos = (self.window_size[0]//2+1, self.__pos[1])
 
     def truncate(self, text):
@@ -84,15 +80,15 @@ class Window():
         return line + "\n" + self.truncate(remaining)
 
 
-    def print(self, msg: str=" ", centered: bool = False) -> None:
+    def print(self, msg: str=" ", centered: bool = False, color: str=COLORS.LIGHT_WHITE) -> None:
         try:
             for line in self.truncate(msg).split('\n'):
-                self.__buffer[self.__pos[0]] = self.__format(line, centered)
+                self.__buffer[self.__pos[0]] = self.__format(TextColor(line, color), centered)
                 self.__pos = (self.__pos[0]+1, self.__pos[1])
         except IndexError:
             self.__add_slots(self.window_size[0])
 
-    def editor(self, msg: str, terminate: str="END") -> str:
+    def editor(self, msg: str, terminate: str="END", color: str = COLORS.LIGHT_WHITE) -> str:
         self.print(msg)
         self.render()
         lines = []
@@ -102,7 +98,7 @@ class Window():
                 t = self.truncate(line).split("\n")
                 try:
                     for i in range(0, len(t)):
-                        self.__buffer[self.__pos[0]-1 + i] = self.__format(msg + t[i])
+                        self.__buffer[self.__pos[0]-1 + i] = self.__format(TextColor(msg + t[i], color))
                         self.render()
                 except IndexError:
                     self.__add_slots(20)
@@ -114,13 +110,16 @@ class Window():
             return '\n'.join(lines)
         return '\n'.join(lines)
 
-    def input(self, msg: str, hidden: bool = False) -> str:
-        self.print(msg)
+    def line(self, char: str = '-',color: str= COLORS.YELLOW):
+        self.print(char*(os.get_terminal_size().columns-4), color=color)
+
+    def input(self, msg: str, hidden: bool = False, color: str = COLORS.LIGHT_WHITE) -> str:
+        self.print(msg, color=color)
         self.render()
         result = input(">>> ")
         if not hidden:
-            self.__buffer[self.__pos[0]-1] = self.__format(msg + result)
+            self.__buffer[self.__pos[0]-1] = self.__format(TextColor(msg + result, color))
         else:
-            self.__buffer[self.__pos[0]-1] = self.__format(msg + ('*'*len(result)))
+            self.__buffer[self.__pos[0]-1] = self.__format(TextColor(msg + ('*'*len(result)), color))
         self.render()
         return result
