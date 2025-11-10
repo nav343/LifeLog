@@ -20,7 +20,4 @@ class COLORS:
     END = "\033[0m"
 
 def TextColor(txt: str, color: str = COLORS.LIGHT_WHITE) -> str:
-    if os.name == 'posix':
-        return f"{color}{txt}{COLORS.END}"
-    else:
-        return txt
+    return f"{color}{txt}{COLORS.END}"
