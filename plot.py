@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 
 def Plot(data: dict):
     _, ax = plt.subplots()
+    plt.style.use("dark_background")
     fruits = bar_labels = ['Happy', 'Calm', 'Sad', 'Stressed', 'Confident']
     counts = list(data.values())
     bar_colors = ['tab:olive', 'tab:green', 'tab:cyan', 'tab:red', 'tab:purple']
