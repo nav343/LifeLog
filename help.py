@@ -1,8 +1,32 @@
 from utils.colors import COLORS
 from utils.window import Window
 
+def showASCII(txt: str, screen: Window):
+    for line in txt.split('\n'):
+        screen.print(line,False, COLORS.LIGHT_GREEN)
+
+
+meme = """
+        _nnnn_                      
+        dGGGGMMb     ,''''''''''''''.
+       @p -p~ qMb    | LifeLog Yay! |
+       M|@||@) M|   _;..............'
+       @,----.JM| -'
+      JS^\\__/  qKL
+     dZP        qKRb
+    dZP          qKKb                           
+   fZP            SMMb
+   HZM            MMMM
+   FqM            MMMM
+ __| ".        |\\dS"qML
+ |    `.       | `' \\Zq
+_)      \\.___.,|     .'
+\\____   )MMMMMM|   .'
+     `-'       `--' hjm
+"""
 
 def ShowHelp(screen: Window):
+    showASCII(meme, screen)
     screen.line("=", color=COLORS.YELLOW)
     screen.print("LIFELOG - HELP PAGE", True, color=COLORS.LIGHT_GREEN)
     screen.line("=", color=COLORS.YELLOW)

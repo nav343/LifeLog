@@ -1,5 +1,6 @@
+import shutil
 from plot import Plot
-from utils.help import ShowHelp
+from help import ShowHelp
 from utils.colors import COLORS
 from utils.window import Window
 import pickle
@@ -117,7 +118,7 @@ def ViewAll(username: str):
             date = data['date']
             content = data['content'][:30] + "..."
             screen.print(f"[{idx}] [{date}] - [{mood} ]", color=COLORS.LIGHT_GREEN)
-            screen.print(f"Title: {i.replace('_', ' ').title()[:-4]}", color=COLORS.LIGHT_GRAY)
+            screen.print(f"Title: {i.replace('_', ' ').title()[:-4]}", color=COLORS.LIGHT_CYAN)
             screen.line()
             screen.print(content, color=COLORS.LIGHT_GRAY)
             screen.line()
@@ -399,6 +400,75 @@ def EditDelete(username: str):
             screen.clear()
             screen.render()
     
+def killSwitch():
+    screen.clear()
+    screen.render()
+    logo = """
+###, ,##, ,##,
+#  # #  # #  #
+###  #  # #  #
+#  # #  # #  #
+###' '##' '##'
+            .--,
+           /  (
+          /    \
+         /      \\                      <---- THIS IS YOUR ACCOUNT NOW
+        /  0  0  \\                      <---- POOR GUY
+((()   |    ()    |   ()))
+\\  ()  (  .____.  )  ()  /
+ |` \\_/ \\  `""`  / \\_/ `|
+ |       `.'--'.`       |
+  \\        `""`        /
+   \\                  /
+    `.              .'    ,
+jgs  |`             |  _.'|
+     |              `-'  /
+     \\                 .'
+      `.____________.-'
+    """
+    showASCII(logo, False)
+    screen.render()
+    time.sleep(2)
+    os.system('cls' if os.name == 'nt' else 'clear')
+    exit()
+
+def Settings(username: str):
+    file = open(".lifelog/user.dat", 'rb+')
+    acc = pickle.load(file)
+    Header("⚙️  Settings", COLORS.LIGHT_GREEN)
+    screen.print(f"> [1] Password Protected Diary: {'ENABLED' if acc['usePass'] == 'y' else 'DISABLED'}", color=COLORS.LIGHT_GREEN)
+    screen.print()
+    screen.line(color=COLORS.RED)
+    screen.print('DANGER ZONE', color=COLORS.LIGHT_RED)
+    screen.line(color=COLORS.RED)
+    screen.print("[2] Delete All Diaries", color=COLORS.LIGHT_RED)
+    screen.print("[3] Delete Account", color=COLORS.LIGHT_RED)
+    screen.print("[4] Go back", color=COLORS.LIGHT_GRAY)
+    screen.line(color=COLORS.RED)
+    screen.print()
+    choice = screen.input("Enter your choice: ", color=COLORS.YELLOW)
+    if choice == '':
+        choice = 1
+    choice = int(choice)
+    if choice == 1:
+        acc['usePass'] = 'y' if acc['usePass'] == 'n' else 'n'
+        pickle.dump(acc, file)
+    elif choice == 2:
+        ans=screen.input("Are you sure you want to delete all diaries. This action is irreversible (y/n)", color=COLORS.LIGHT_RED)
+        if ans.lower() == 'y':
+            shutil.rmtree(f".lifelog/{username}")
+            os.mkdir(f".lifelog/{username}")
+    elif choice == 3:
+        ans=screen.input("Are you sure you want to permanentely delete your account.\nThis action is irreversible and you will loose all your data (y/n)", color=COLORS.LIGHT_RED)
+        if ans.lower() == 'y':
+            shutil.rmtree(f".lifelog/")
+            screen.print("Account deleted successfully!", color=COLORS.RED)
+            killSwitch()
+    else:
+        screen.clear()
+        screen.render()
+    pickle.dump(acc, file)
+    file.close()
 
 def Dashboard(username: str):
     lastLogged = loadStats()['lastLogged']
@@ -413,8 +483,9 @@ def Dashboard(username: str):
     screen.print("[2] 📖  View past entries", color=COLORS.LIGHT_GRAY)  
     screen.print("[3] 🧹  Edit or delete an entry", color=COLORS.LIGHT_GRAY)  
     screen.print("[4] 📊  View mood analytics", color=COLORS.LIGHT_GRAY)  
-    screen.print("[5] 🔒  Log out", color=COLORS.LIGHT_GRAY)  
-    screen.print("[6] 👋  Quit", color=COLORS.LIGHT_GRAY)  
+    screen.print("[5] ⚙️   Settings", color=COLORS.LIGHT_GRAY)  
+    screen.print("[6] 🔒  Log out", color=COLORS.LIGHT_GRAY)  
+    screen.print("[7] 👋  Quit", color=COLORS.LIGHT_GRAY)  
     screen.print()
     screen.line()
     screen.print()
@@ -434,9 +505,11 @@ def Dashboard(username: str):
         elif choice == 4:
             MoodAnalytics(username)
         elif choice == 5:
+            Settings(username)
+        elif choice == 6:
             Logout()
             Quit(username, logged=True)
-        elif choice == 6:
+        elif choice == 7:
             Quit(username, logged=False)
             screen.quit()
         else:
@@ -599,12 +672,12 @@ def Quit(username: str,logged: bool):
     time.sleep(1)
     screen.clear()
 
-def showASCII(txt: str):
+def showASCII(txt: str, center: bool = True):
     for line in txt.split('\n'):
         if line.strip() == 'LifeLog':
-            screen.print(line, True, COLORS.YELLOW)
+            screen.print(line, center, COLORS.YELLOW)
         else:
-            screen.print(line, True, COLORS.LIGHT_GREEN)
+            screen.print(line, center, COLORS.LIGHT_GREEN)
 
 def loadStats():
     with open(".lifelog/stats.dat", 'rb') as stats:

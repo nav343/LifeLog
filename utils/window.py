@@ -20,9 +20,9 @@ class Window():
         self.__set_buffer()
 
     def __remove_emoji(self, txt:str) -> int:
-        if any(element in txt for element in ['📖', '🧹', '📊', '🔒', '🌿', '😊', '😌', '😔', '😤', '😎', '💭', "👋" ]):
+        if any(element in txt for element in ['📖', '🧹', '📊', '🔒', '🌿', '😊', '😌', '😔', '😤', '😎', '💭', "👋"]):
             return txt.count(txt[0]) + 1
-        elif any(element in txt for element in ['✍️','😊', '😌', '😔', '😤', '😎' ]):
+        elif any(element in txt for element in ['✍️','😊', '😌', '😔', '😤', '😎'  , "⚙️"]):
             return 0 if txt.count(txt[0]) == 1 else -1
         else:
             return 1
@@ -92,6 +92,7 @@ class Window():
                 self.__pos = (self.__pos[0]+1, self.__pos[1])
         except IndexError:
             self.__add_slots(self.window_size[0])
+            self.__pos = (self.__pos[0]+1, self.__pos[1])
 
     def editor(self, msg: str, terminate: str="END", color: str = COLORS.LIGHT_WHITE) -> str:
         self.print(msg, color=color)
