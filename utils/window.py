@@ -51,6 +51,10 @@ class Window():
         self.__pos = (currPos[0]-1, currPos[1])
         self.render()
 
+    def close(self) -> None:
+        os.system(self.__clear)
+        self.__buffer = []
+
     def clear(self) -> None:
         os.system(self.__clear)
         self.__buffer = []
